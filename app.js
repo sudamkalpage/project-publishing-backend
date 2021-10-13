@@ -22,28 +22,8 @@ app.use(express.json());
 app.use('static', express.static('static'));
 
 //define middlewares
-// const markerRoutes = require('./routes/markers');
-// app.use('/marker', markerRoutes);
-
-// const teachersRoutes = require('./routes/teachers');
-// app.use('/teachers', teachersRoutes);
-
-// const parentsRoutes = require('./routes/parents');
-// app.use('/parents', parentsRoutes);
-
-// const paperlistsRoutes = require('./routes/paperlists');
-// app.use('/paperlists', paperlistsRoutes);
-
 const usersRoute = require('./routes/users')
 app.use('/users',usersRoute)
-
-// const papersRoute = require('./routes/papers')
-// app.use('/papers',papersRoute)
-// const submissionsRoute = require('./routes/submissions')
-// app.use('/submissions',submissionsRoute)
-
-// const markerPaperListRoutes= require('./routes/marker_paperlists');
-// app.use('/marker_paperlist',markerPaperListRoutes);
 
 //Error handling
 app.use((req, res, next) => {
