@@ -33,7 +33,7 @@ exports.users_find_by_id =  async(req,res) => {
         });
 };
 // adding a new user
-exports.users_add =  async(req,res) => {
+exports.users_signup =  async(req,res) => {
     const new_user = new User({
         _id: new mongoose.Types.ObjectId(),
         username: req.body.username,

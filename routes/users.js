@@ -1,11 +1,10 @@
 const express = require('express')
 const Router = express.Router()
-const User = require('../models/user')
 const upload = require('../middleware/upload')
 const usersController =  require('../controllers/users');
 
 const uploadMultiple = upload.fields([
-    { 
+    {
         name: 'profile_picture', 
         maxCount: 1 
     }
@@ -16,20 +15,11 @@ Router.get('/', async(req,res)=>{
     res.send("User Hme page")  
 })
 
-// Router.get('/find/all', async(req,res)=>{
-//    try{
-//        const users = await User.find()
-//        res.json(users)
-//    }catch(err){
-//         res.send('Error: '+ err)
-//    }
-// })
-
 Router.get('/find/all',usersController.users_find_all);
 
 Router.get('/find/:id',usersController.users_find_by_id);
 
-Router.post('/add',usersController.users_add);
+Router.post('/signup',usersController.users_signup);
 
 Router.delete('/delete/:id',usersController.users_delete);
 

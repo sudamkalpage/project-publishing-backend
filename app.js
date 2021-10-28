@@ -1,24 +1,20 @@
 /*jshint esversion: 8 */
-
 const express = require('express');
 const mongoose = require('mongoose');
-// const morgan = require('morgan');
-
-const url = 'mongodb://localhost/project_publishing_db';
-
-const app = express();
+const morgan = require('morgan');
 
 //connect to database
+const url = 'mongodb://localhost/project_publishing_db';
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.Promise = global.Promise;
 const con = mongoose.connection;
-
 con.on('open', () => {
     console.log("connected .. ");
 });
 
+const app = express();
 app.use(express.json());
-// app.use(morgan('dev'));
+app.use(morgan('dev'));
 app.use('static', express.static('static'));
 
 //define middlewares
@@ -31,7 +27,6 @@ app.use((req, res, next) => {
     error.status = 404;
     next(error);
 });
-
 app.use((error, req, res, next) => {
     res.status(error.status || 500);
     res.json({
@@ -41,7 +36,4 @@ app.use((error, req, res, next) => {
     });
 });
 
-//start server in port 9000
-app.listen(9000, () => {
-    console.log('Server started');
-});
+module.exports = app
