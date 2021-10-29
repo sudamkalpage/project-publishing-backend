@@ -11,22 +11,25 @@ function initialize(passport, getUserByEmail, getUserById) {
     // console.log(user)
     
     if (user == null) {
-      return done(null, false, { message: 'No user with that email' })
+        console.log('No user with that email..')
+        return done(null, false, { message: 'No user with that email' })
     }
 
     try {
       if (await bcrypt.compare(password, user.password)) {
         console.log('Password is correct...')
-        
         return done(null, user)
       } else {
+        console.log('Password is incorrect..')
         return done(null, false, { message: 'Password incorrect' })
       }
     } catch (e) {
-      return done(e)
+        console.log(e)
+        return done(e)
     }
   }
 
+//   console.log(user)
   passport.use(new LocalStrategy({ usernameField: 'email' }, authenticateUser))
   passport.serializeUser((user, done) => done(null, user.email))
   passport.deserializeUser((email, done) => {return done(null, user)})

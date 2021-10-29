@@ -8,6 +8,7 @@ const flash = require('express-flash')
 const session = require('express-session')
 const methodOverride = require('method-override')
 const initializePassport = require('./passport-config')
+const jwt = require('jsonwebtoken')
 const User = require('./models/user');
 
 // const users = []
@@ -21,7 +22,6 @@ const con = mongoose.connection;
 con.on('open', () => {
     console.log("connected .. ");
 });
-
 
 const app = express();
 app.use(express.json());
@@ -42,23 +42,7 @@ app.use(methodOverride('_method'))
 const usersRoute = require('./routes/users')
 app.use('/users',usersRoute)
 
-
-app.post('/register', checkNotAuthenticated, async (req, res) => {
-    // try {
-    //   const hashedPassword = await bcrypt.hash(req.body.password, 10)
-    //   users.push({
-    //     id: Date.now().toString(),
-    //     name: req.body.username,
-    //     email: req.body.email,
-    //     password: hashedPassword
-    //   })
-    // console.log(users)
-    // res.sendStatus(200)
-
-    // } catch {
-    //   res.redirect('/register')
-    // }
-    
+app.post('/register', checkNotAuthenticated, async (req, res) => {   
     try{
         const hashedPassword = await bcrypt.hash(req.body.password, 10) 
         const new_user = new User({
@@ -76,16 +60,16 @@ app.post('/register', checkNotAuthenticated, async (req, res) => {
                 res.status(500).json({error: err});
             }); 
     }    catch {
-          res.redirect('/register')
+            res.status(400).json("Registration was Failed!");  
     }
-    
-
-    
   })
 
+app.get('/failedlogin', async(req,res)=>{
+    res.status(401).json("Login attempt was failed. Check credentials again!");    
+})
+
 app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
-successRedirect: '/users/find/all',
-failureRedirect: '/login',
+failureRedirect: '/failedlogin',
 failureFlash: true
 }),
 (req, res, next) => {
@@ -98,9 +82,9 @@ failureFlash: true
   }
 )
 
-app.delete('/logout', (req, res) => {
+app.delete('/logout',checkAuthenticated, (req, res) => {
 req.logOut()
-res.redirect('/login')
+res.status(200).json("Logout was successfull!");   
 })
 
 
@@ -121,8 +105,6 @@ app.use((error, req, res, next) => {
 
 initializePassport(
     passport,
-    // email => users.find(user => user.email === email),
-    // id => users.find(user => user._id === id)
     async (email) => await User.findOne({email: email }),
     id =>  User.findOne({_id: id })
   )
@@ -131,15 +113,16 @@ function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
       return next()
     }
-  
-    res.redirect('/logins')
+    console.log('Not Authenticated..')   
+    return res.status(409).json("You are not authenticated");  
   }
   
-  function checkNotAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {        
-      return res.redirect('/')
+  function checkNotAuthenticated(req, res, next){
+    if (req.isAuthenticated()) {  
+        console.log('Already Authenticated..')   
+        return res.status(409).json("You are already authenticated");  
     }
-    console.log('Not Authenticated..')
+    console.log('Not already Authenticated..')
     next()
   }
 
