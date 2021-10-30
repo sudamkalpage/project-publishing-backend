@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken')
 const Token = require('./models/token');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
-const bcrypt = require('bcrypt')
 const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
@@ -96,7 +95,7 @@ app.delete('/logout', checkAuthenticated,  async (req, res) => {
 
 
 function generateAccessToken(user) {
-  return jwt.sign(user, ACCESS_TOKEN_SECRET, { expiresIn: '10s' })
+  return jwt.sign(user, ACCESS_TOKEN_SECRET, { expiresIn: '120s' })
 }
 
 initializePassport(
