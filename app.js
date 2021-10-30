@@ -13,6 +13,7 @@ const User = require('./models/user');
 
 // const users = []
 let SESSION_SECRET = '2095ac68f54991da41b2b776fbc93b55bb5b1f136e6fa428fccbafe9aa212890e54da130eda9d9a18b93055aa6ba30eb3a0456f967f56bdf3b1b74250b6513d3'
+let ACCESS_TOKEN_SECRET = '36386131b427d63b12369f8a4f10be7a35c62113efd8f2dd80aa53667e4d8e8a6f18bbb5bf82a256c7466f25dde22deab1a77047b7a8a69c074c0b261d89aac4'
 
 //connect to database
 const url = 'mongodb://localhost/project_publishing_db';
@@ -109,6 +110,19 @@ initializePassport(
     id =>  User.findOne({_id: id })
   )
   
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token == null) return res.sendStatus(401)
+
+    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
+        console.log(err)
+        if (err) return res.sendStatus(403)
+        req.user = user
+        next()
+    })
+}
+
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
       return next()
@@ -117,13 +131,13 @@ function checkAuthenticated(req, res, next) {
     return res.status(409).json("You are not authenticated");  
   }
   
-  function checkNotAuthenticated(req, res, next){
-    if (req.isAuthenticated()) {  
-        console.log('Already Authenticated..')   
-        return res.status(409).json("You are already authenticated");  
-    }
-    console.log('Not already Authenticated..')
-    next()
-  }
+function checkNotAuthenticated(req, res, next){
+if (req.isAuthenticated()) {  
+    console.log('Already Authenticated..')   
+    return res.status(409).json("You are already authenticated");  
+}
+console.log('Not already Authenticated..')
+next()
+}
 
 module.exports = app
