@@ -1,5 +1,5 @@
 const request = require('supertest')
-const app = require('./app')
+const app = require('../app')
  
 describe(`POST signup`, () => {
     describe("given a username, email and password", () => {
@@ -26,24 +26,10 @@ describe(`POST signup`, () => {
         })
         expect(response.body._id).toBeDefined()
       })
-    })
-  
-    // describe("when the username and password is missing", () => {
-    //   test("should respond with a status code of 400", async () => {
-    //     const bodyData = [
-    //       {username: "username"},
-    //       {password: "password"},
-    //       {}
-    //     ]
-    //     for (const body of bodyData) {
-    //       const response = await request(app).post("/users").send(body)
-    //       expect(response.statusCode).toBe(400)
-    //     }
-    //   })
-    // })
-  
+    })  
   })
 
+ 
 describe(`GET find all`, () => {
     describe("given a username and password", () => {
   

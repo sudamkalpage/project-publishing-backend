@@ -2,6 +2,8 @@ const express = require('express')
 const Article = require('../models/article')
 const User = require('../models/user')
 const router = express.Router()
+const jwt = require('jsonwebtoken')
+let ACCESS_TOKEN_SECRET = '36386131b427d63b12369f8a4f10be7a35c62113efd8f2dd80aa53667e4d8e8a6f18bbb5bf82a256c7466f25dde22deab1a77047b7a8a69c074c0b261d89aac4'
 
 router.post('/add', async (req, res, next) => {
     req.article = new Article()
@@ -16,10 +18,10 @@ router.get('/find/all', async (req, res) => {
 router.get('/find/:slug', async (req, res) => {
   const article = await Article.findOne({ slug: req.params.slug })
   if (article == null) res.status(400).json("Project is not available with this url. Please check again!");
-  res.status(200).json(article);
+  else res.status(200).json(article);
 })
 
-router.get('/fetch/:username', async (req, res) => {
+router.get('/fetch/:username',authenticateToken, async (req, res) => {
     console.log("fetching all projects..")
     const user = await User.findOne({ username: req.params.username })
     const articles = await Article.find({ email : user.email })
@@ -44,7 +46,7 @@ router.post('/follow/:slug', async (req, res) => {
 router.get('/followers/:slug', async (req, res) => {
     const article = await Article.findOne({ slug: req.params.slug })
     if (article == null) res.status(400).json("Project is not available with this url. Please check again!");
-    res.status(200).json(article.followed);
+    else res.status(200).json(article.followed);
 })
 
 router.patch('/edit/:id', async (req, res, next) => {
@@ -117,6 +119,19 @@ function editArticleAndRedirect(path) {
         res.status(500).json({error: err});
     });
   }
+}
+
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token == null) return res.status(401).json("Access token is required!")
+
+    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
+        console.log(err)
+        if (err) return res.status(403).json("Access token is expired!")
+        req.user = user
+        next()
+    })
 }
 
 module.exports = router
