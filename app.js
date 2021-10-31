@@ -10,6 +10,7 @@ const methodOverride = require('method-override')
 const initializePassport = require('./passport-config')
 const jwt = require('jsonwebtoken')
 const User = require('./models/user');
+const Article = require('./models/article');
 
 // const users = []
 let SESSION_SECRET = '2095ac68f54991da41b2b776fbc93b55bb5b1f136e6fa428fccbafe9aa212890e54da130eda9d9a18b93055aa6ba30eb3a0456f967f56bdf3b1b74250b6513d3'
@@ -41,7 +42,9 @@ app.use(methodOverride('_method'))
 
 //define middlewares
 const usersRoute = require('./routes/users')
+const projectsRoute = require('./routes/projects')
 app.use('/users',usersRoute)
+app.use('/projects',projectsRoute)
 
 app.post('/register', checkNotAuthenticated, async (req, res) => {   
     try{
